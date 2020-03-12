@@ -1,10 +1,13 @@
-const bodyParser = require('body-parser');
 const express = require('express');
 const fs = require('fs');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const uuid = require('uuid');
 const config = require('./config');
+const controllers = require('./controllers');
+const useControllers = require('./util/use-controllers');
+const path = require('path');
+const bb = require('express-busboy');
 
 // App and loaded modules.
 const app = express();
@@ -15,6 +18,11 @@ const HTTP_TOOLARGE_CODE = 413;
 const HTTP_INTERNALERROR_CODE = 500;
 
 // Enable cross-origin ressource sharing.
+bb.extend(app, {
+  upload: true,
+  path: path.join(__dirname, '..', 'data'),
+  allowedPath: /./
+});
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -26,18 +34,15 @@ app.use((req, res, next) => {
 });
 
 const args = config.cliArgs;
-app.use(bodyParser.json({limit: args.limit}));
-app.use(bodyParser.urlencoded({extended: true, limit: args.limit}));
-
 const accessLogStream = fs.createWriteStream(args.logdir + '/access.log', {
   flags: 'a'
 });
 
 app.use(morgan('combined', {stream: accessLogStream}));
-
+useControllers(app, controllers);
 app.use(helmet());
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   if (
     err instanceof SyntaxError &&
     err.status === HTTP_ERROR_CODE &&
@@ -145,9 +150,9 @@ if (args.router !== 'libosrm') {
       options.push('-p', profileName + ':' + profile.port);
     } else {
       console.error(
-        "Incomplete configuration: profile '" +
-          profileName +
-          "' requires 'host' and 'port'."
+        'Incomplete configuration: profile \'' +
+        profileName +
+        '\' requires \'host\' and \'port\'.'
       );
     }
   }
@@ -250,7 +255,7 @@ app.post('/', [
 ]);
 
 const server = app.listen(args.port, () => {
-  console.log('vroom-express listening on port ' + args.port + '!');
+  console.log('Routing express server listening on port ' + args.port + '!');
 });
 
 server.setTimeout(args.timeout);
