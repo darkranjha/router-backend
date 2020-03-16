@@ -4,13 +4,13 @@ const fs = require('fs');
 
 let config_yml;
 try {
-  config_yml = yaml.safeLoad(fs.readFileSync('./config.yml'));
+    config_yml = yaml.safeLoad(fs.readFileSync('./config.yml'));
 } catch (err) {
-  console.log(
-    'Please provide a valid config.yml in the root.\nSee https://github.com/VROOM-Project/vroom-express#setup\n'
-  );
-  process.exitCode = 1;
-  process.exit();
+    console.log(
+        'Please provide a valid config.yml in the root.\nSee https://github.com/VROOM-Project/vroom-express#setup\n'
+    );
+    process.exitCode = 1;
+    process.exit();
 }
 
 // Prefer env variable for router
@@ -18,23 +18,23 @@ const router = process.env.VROOM_ROUTER || config_yml.cliArgs.router;
 
 // Config variables.
 const cliArgs = minimist(process.argv.slice(2), {
-  alias: {
-    p: 'port', // eslint-disable-line
-    r: 'router', // eslint-disable-line
-  },
-  boolean: ['geometry', 'override'],
-  default: {
-    geometry: config_yml.cliArgs.geometry, // retrieve geometry (-g)
-    limit: config_yml.cliArgs.limit, // max request size
-    logdir: __dirname + config_yml.cliArgs.logdir, // put logs in there
-    maxlocations: config_yml.cliArgs.maxlocations, // max number of jobs/shipments locations
-    maxvehicles: config_yml.cliArgs.maxvehicles, // max number of vehicles
-    override: config_yml.cliArgs.override, // allow cl option override (-g only so far)
-    path: config_yml.cliArgs.path, // VROOM path (if not in $PATH)
-    port: config_yml.cliArgs.port, // expressjs port
-    router: router, // routing backend (osrm, libosrm or ors)
-    timeout: config_yml.cliArgs.timeout // milli-seconds.
-  }
+    alias: {
+        p: 'port', // eslint-disable-line
+        r: 'router' // eslint-disable-line
+    },
+    boolean: ['geometry', 'override'],
+    default: {
+        geometry: config_yml.cliArgs.geometry, // retrieve geometry (-g)
+        limit: config_yml.cliArgs.limit, // max request size
+        logdir: __dirname + config_yml.cliArgs.logdir, // put logs in there
+        maxlocations: config_yml.cliArgs.maxlocations, // max number of jobs/shipments locations
+        maxvehicles: config_yml.cliArgs.maxvehicles, // max number of vehicles
+        override: config_yml.cliArgs.override, // allow cl option override (-g only so far)
+        path: config_yml.cliArgs.path, // VROOM path (if not in $PATH)
+        port: config_yml.cliArgs.port, // expressjs port
+        router: router, // routing backend (osrm, libosrm or ors)
+        timeout: config_yml.cliArgs.timeout // milli-seconds.
+    }
 });
 
 // Error codes
@@ -47,15 +47,15 @@ const VROOM_TOOLARGE_CODE = 4;
 // Hard-code error codes 1, 2 and 3 as defined in vroom. Add 4 code
 // for size checks.
 const vroomErrorCodes = {
-  input: VROOM_INPUTERROR_CODE,
-  internal: VROOM_INTERNALERROR_CODE,
-  ok: VROOM_OK_CODE,
-  routing: VROOM_ROUTINGERROR_CODE,
-  tooLarge: VROOM_TOOLARGE_CODE
+    input: VROOM_INPUTERROR_CODE,
+    internal: VROOM_INTERNALERROR_CODE,
+    ok: VROOM_OK_CODE,
+    routing: VROOM_ROUTINGERROR_CODE,
+    tooLarge: VROOM_TOOLARGE_CODE
 };
 
 module.exports = {
-  cliArgs: cliArgs,
-  routingServers: config_yml.routingServers,
-  vroomErrorCodes: vroomErrorCodes
+    cliArgs: cliArgs,
+    routingServers: config_yml.routingServers,
+    vroomErrorCodes: vroomErrorCodes
 };
